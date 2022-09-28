@@ -17,7 +17,7 @@ Reads in IMU data from a static thermal calibration test and performs a curve fi
 Data can be gathered using the following sequence:
 
 1) Power up the board and set the TC_A_ENABLE, TC_B_ENABLE and TC_G_ENABLE parameters to 1
-2) Set all CAL_GYR and CAL_ACC parameters to defaults
+2) Set all CAL_ACC*, CAL_GYR*, and CAL_MAG* parameters to defaults
 3) Set the parameter SDLOG_MODE to 2, and SDLOG_PROFILE "Thermal calibration" bit (2) to enable logging of sensor data for calibration and power off
 4) Cold soak the board for 30 minutes
 5) Move to a warm dry, still air, constant pressure environment.
@@ -31,7 +31,6 @@ Data can be gathered using the following sequence:
 
 Outputs thermal compensation parameters in a file named <inputfilename>.params which can be loaded onto the board using QGroundControl
 Outputs summary plots in a pdf file named <inputfilename>.pdf
-
 """
 
 def resampleWithDeltaX(x,y):
@@ -68,7 +67,7 @@ def resampleWithDeltaX(x,y):
 def median_filter(data):
     return medfilt(data, 31)
 
-parser = argparse.ArgumentParser(description='Reads in IMU data from a static thermal calibration test and performs a curve fit of  accel, gyro, mag, and baro bias vs temperature')
+parser = argparse.ArgumentParser(description='Reads in IMU data from a static thermal calibration test and performs a curve fit of gyro, accel and baro bias vs temperature')
 parser.add_argument('filename', metavar='file.ulg', help='ULog input file')
 parser.add_argument('--no_resample', dest='noResample', action='store_const',
                    const=True, default=False, help='skip resampling and use raw data')
@@ -210,6 +209,7 @@ if num_accels >= 1 and not math.isnan(sensor_accel_0['temperature'][0]):
     accel_0_params['TC_A0_TMIN'] = np.amin(sensor_accel_0['temperature'])
     accel_0_params['TC_A0_TMAX'] = np.amax(sensor_accel_0['temperature'])
     accel_0_params['TC_A0_TREF'] = 0.5 * (accel_0_params['TC_A0_TMIN'] + accel_0_params['TC_A0_TMAX'])
+
     temp_rel = sensor_accel_0['temperature'] - accel_0_params['TC_A0_TREF']
     temp_rel_resample = np.linspace(accel_0_params['TC_A0_TMIN']-accel_0_params['TC_A0_TREF'], accel_0_params['TC_A0_TMAX']-accel_0_params['TC_A0_TREF'], 100)
     temp_resample = temp_rel_resample + accel_0_params['TC_A0_TREF']
@@ -325,6 +325,7 @@ if num_accels >= 2 and not math.isnan(sensor_accel_1['temperature'][0]):
     accel_1_params['TC_A1_TMIN'] = np.amin(sensor_accel_1['temperature'])
     accel_1_params['TC_A1_TMAX'] = np.amax(sensor_accel_1['temperature'])
     accel_1_params['TC_A1_TREF'] = 0.5 * (accel_1_params['TC_A1_TMIN'] + accel_1_params['TC_A1_TMAX'])
+
     temp_rel = sensor_accel_1['temperature'] - accel_1_params['TC_A1_TREF']
     temp_rel_resample = np.linspace(accel_1_params['TC_A1_TMIN']-accel_1_params['TC_A1_TREF'], accel_1_params['TC_A1_TMAX']-accel_1_params['TC_A1_TREF'], 100)
     temp_resample = temp_rel_resample + accel_1_params['TC_A1_TREF']
@@ -441,6 +442,7 @@ if num_accels >= 3 and not math.isnan(sensor_accel_2['temperature'][0]):
     accel_2_params['TC_A2_TMIN'] = np.amin(sensor_accel_2['temperature'])
     accel_2_params['TC_A2_TMAX'] = np.amax(sensor_accel_2['temperature'])
     accel_2_params['TC_A2_TREF'] = 0.5 * (accel_2_params['TC_A2_TMIN'] + accel_2_params['TC_A2_TMAX'])
+
     temp_rel = sensor_accel_2['temperature'] - accel_2_params['TC_A2_TREF']
     temp_rel_resample = np.linspace(accel_2_params['TC_A2_TMIN']-accel_2_params['TC_A2_TREF'], accel_2_params['TC_A2_TMAX']-accel_2_params['TC_A2_TREF'], 100)
     temp_resample = temp_rel_resample + accel_2_params['TC_A2_TREF']
@@ -556,6 +558,7 @@ if num_accels >= 4 and not math.isnan(sensor_accel_3['temperature'][0]):
     accel_3_params['TC_A3_TMIN'] = np.amin(sensor_accel_3['temperature'])
     accel_3_params['TC_A3_TMAX'] = np.amax(sensor_accel_3['temperature'])
     accel_3_params['TC_A3_TREF'] = 0.5 * (accel_3_params['TC_A3_TMIN'] + accel_3_params['TC_A3_TMAX'])
+
     temp_rel = sensor_accel_3['temperature'] - accel_3_params['TC_A3_TREF']
     temp_rel_resample = np.linspace(accel_3_params['TC_A3_TMIN']-accel_3_params['TC_A3_TREF'], accel_3_params['TC_A3_TMAX']-accel_3_params['TC_A3_TREF'], 100)
     temp_resample = temp_rel_resample + accel_3_params['TC_A3_TREF']
@@ -657,6 +660,7 @@ if num_gyros >= 1 and not math.isnan(sensor_gyro_0['temperature'][0]):
     gyro_0_params['TC_G0_TMIN'] = np.amin(sensor_gyro_0['temperature'])
     gyro_0_params['TC_G0_TMAX'] = np.amax(sensor_gyro_0['temperature'])
     gyro_0_params['TC_G0_TREF'] = 0.5 * (gyro_0_params['TC_G0_TMIN'] + gyro_0_params['TC_G0_TMAX'])
+
     temp_rel = sensor_gyro_0['temperature'] - gyro_0_params['TC_G0_TREF']
     temp_rel_resample = np.linspace(gyro_0_params['TC_G0_TMIN']-gyro_0_params['TC_G0_TREF'], gyro_0_params['TC_G0_TMAX']-gyro_0_params['TC_G0_TREF'], 100)
     temp_resample = temp_rel_resample + gyro_0_params['TC_G0_TREF']
@@ -708,7 +712,7 @@ if num_gyros >= 1 and not math.isnan(sensor_gyro_0['temperature'][0]):
     gyro_0_z_resample = fit_coef_gyro_0_z(temp_rel_resample)
 
     # gyro0 vs temperature
-    plt.figure(5,figsize=(20,13))
+    plt.figure(1,figsize=(20,13))
 
     # draw plots
     plt.subplot(3,1,1)
@@ -736,6 +740,7 @@ if num_gyros >= 1 and not math.isnan(sensor_gyro_0['temperature'][0]):
     plt.grid()
 
     pp.savefig()
+
 
 #################################################################################
 
@@ -769,6 +774,7 @@ if num_gyros >= 2 and not math.isnan(sensor_gyro_1['temperature'][0]):
     gyro_1_params['TC_G1_TMIN'] = np.amin(sensor_gyro_1['temperature'])
     gyro_1_params['TC_G1_TMAX'] = np.amax(sensor_gyro_1['temperature'])
     gyro_1_params['TC_G1_TREF'] = 0.5 * (gyro_1_params['TC_G1_TMIN'] + gyro_1_params['TC_G1_TMAX'])
+
     temp_rel = sensor_gyro_1['temperature'] - gyro_1_params['TC_G1_TREF']
     temp_rel_resample = np.linspace(gyro_1_params['TC_G1_TMIN']-gyro_1_params['TC_G1_TREF'], gyro_1_params['TC_G1_TMAX']-gyro_1_params['TC_G1_TREF'], 100)
     temp_resample = temp_rel_resample + gyro_1_params['TC_G1_TREF']
@@ -881,6 +887,7 @@ if num_gyros >= 3 and not math.isnan(sensor_gyro_2['temperature'][0]):
     gyro_2_params['TC_G2_TMIN'] = np.amin(sensor_gyro_2['temperature'])
     gyro_2_params['TC_G2_TMAX'] = np.amax(sensor_gyro_2['temperature'])
     gyro_2_params['TC_G2_TREF'] = 0.5 * (gyro_2_params['TC_G2_TMIN'] + gyro_2_params['TC_G2_TMAX'])
+
     temp_rel = sensor_gyro_2['temperature'] - gyro_2_params['TC_G2_TREF']
     temp_rel_resample = np.linspace(gyro_2_params['TC_G2_TMIN']-gyro_2_params['TC_G2_TREF'], gyro_2_params['TC_G2_TMAX']-gyro_2_params['TC_G2_TREF'], 100)
     temp_resample = temp_rel_resample + gyro_2_params['TC_G2_TREF']
@@ -993,6 +1000,7 @@ if num_gyros >= 4 and not math.isnan(sensor_gyro_3['temperature'][0]):
     gyro_3_params['TC_G3_TMIN'] = np.amin(sensor_gyro_3['temperature'])
     gyro_3_params['TC_G3_TMAX'] = np.amax(sensor_gyro_3['temperature'])
     gyro_3_params['TC_G3_TREF'] = 0.5 * (gyro_3_params['TC_G3_TMIN'] + gyro_3_params['TC_G3_TMAX'])
+
     temp_rel = sensor_gyro_3['temperature'] - gyro_3_params['TC_G3_TREF']
     temp_rel_resample = np.linspace(gyro_3_params['TC_G3_TMIN']-gyro_3_params['TC_G3_TREF'], gyro_3_params['TC_G3_TMAX']-gyro_3_params['TC_G3_TREF'], 100)
     temp_resample = temp_rel_resample + gyro_3_params['TC_G3_TREF']
@@ -1062,7 +1070,7 @@ if num_gyros >= 4 and not math.isnan(sensor_gyro_3['temperature'][0]):
 
 #################################################################################
 
-# define data dictionary of accel 0 thermal correction  parameters
+# define data dictionary of mag 0 thermal correction  parameters
 mag_0_params = {
 'TC_M0_ID':0,
 'TC_M0_TMIN':0.0,
@@ -1082,17 +1090,36 @@ mag_0_params = {
 'TC_M0_X3_2':0.0
 }
 
-# curve fit the data for accel 0 corrections
-if num_mags >= 1 and not math.isnan(sensor_mag_0['temperature'][0]):
-    mag_0_params['TC_M0_ID'] = int(np.median(sensor_mag_0['device_id']))
+# curve fit the data for mag 0 corrections
+if num_mags >= 1:
 
-    # find the min, max and reference temperature
-    mag_0_params['TC_M0_TMIN'] = np.amin(sensor_mag_0['temperature'])
-    mag_0_params['TC_M0_TMAX'] = np.amax(sensor_mag_0['temperature'])
-    mag_0_params['TC_M0_TREF'] = 0.5 * (mag_0_params['TC_M0_TMIN'] + mag_0_params['TC_M0_TMAX'])
-    temp_rel = sensor_mag_0['temperature'] - mag_0_params['TC_M0_TREF']
+    mag_0_params['TC_M0_ID'] = int(np.median(sensor_baro_0['device_id']))
+
+    if math.isnan(sensor_mag_0['temperature'][0]):
+
+        # find the min, max and reference temperature
+        mag_0_params['TC_M0_TMIN'] = np.amin(sensor_baro_0['temperature'])
+        mag_0_params['TC_M0_TMAX'] = np.amax(sensor_baro_0['temperature'])
+        mag_0_params['TC_M0_TREF'] = 0.5 * (mag_0_params['TC_M0_TMIN'] + mag_0_params['TC_M0_TMAX'])
+
+        temp_rel = sensor_baro_0['temperature'] - mag_0_params['TC_M0_TREF']
+
+    else:
+        mag_0_params['TC_M0_ID'] = int(np.median(sensor_mag_0['device_id']))
+
+        # find the min, max and reference temperature
+        mag_0_params['TC_M0_TMIN'] = np.amin(sensor_mag_0['temperature'])
+        mag_0_params['TC_M0_TMAX'] = np.amax(sensor_mag_0['temperature'])
+        mag_0_params['TC_M0_TREF'] = 0.5 * (mag_0_params['TC_M0_TMIN'] + mag_0_params['TC_M0_TMAX'])
+
+        temp_rel = sensor_mag_0['temperature'] - mag_0_params['TC_M0_TREF']
+
     temp_rel_resample = np.linspace(mag_0_params['TC_M0_TMIN']-mag_0_params['TC_M0_TREF'], mag_0_params['TC_M0_TMAX']-mag_0_params['TC_M0_TREF'], 100)
-    temp_resample = temp_rel_resample + mag_0_params['TC_M0_TREF']
+    temp_resample     = temp_rel_resample + mag_0_params['TC_M0_TREF']
+
+    # Delete the dataset first and last 10 seconds of data
+    sensor_mag_0 = np.delete(sensor_mag_0, range(0,1000), axis=['x'])
+    sensor_mag_0 = np.delete(sensor_mag_0, range(-1000,), axis=['x'])
 
     sensor_mag_0['x'] = median_filter(sensor_mag_0['x'])
     sensor_mag_0['y'] = median_filter(sensor_mag_0['y'])
@@ -1100,6 +1127,7 @@ if num_mags >= 1 and not math.isnan(sensor_mag_0['temperature'][0]):
 
     # fit X axis
     correction_x = sensor_mag_0['x'] - np.median(sensor_mag_0['x'])
+
     if noResample:
         coef_mag_0_x = np.polyfit(temp_rel,correction_x, 3)
     else:
@@ -1110,11 +1138,13 @@ if num_mags >= 1 and not math.isnan(sensor_mag_0['temperature'][0]):
     mag_0_params['TC_M0_X2_0'] = coef_mag_0_x[1]
     mag_0_params['TC_M0_X1_0'] = coef_mag_0_x[2]
     mag_0_params['TC_M0_X0_0'] = coef_mag_0_x[3]
+
     fit_coef_mag_0_x = np.poly1d(coef_mag_0_x)
     correction_x_resample = fit_coef_mag_0_x(temp_rel_resample)
 
     # fit Y axis
     correction_y = sensor_mag_0['y'] - np.median(sensor_mag_0['y'])
+
     if noResample:
         coef_mag_0_y = np.polyfit(temp_rel, correction_y, 3)
     else:
@@ -1125,11 +1155,13 @@ if num_mags >= 1 and not math.isnan(sensor_mag_0['temperature'][0]):
     mag_0_params['TC_M0_X2_1'] = coef_mag_0_y[1]
     mag_0_params['TC_M0_X1_1'] = coef_mag_0_y[2]
     mag_0_params['TC_M0_X0_1'] = coef_mag_0_y[3]
+
     fit_coef_mag_0_y = np.poly1d(coef_mag_0_y)
     correction_y_resample = fit_coef_mag_0_y(temp_rel_resample)
 
     # fit Z axis
     correction_z = sensor_mag_0['z'] - np.median(sensor_mag_0['z'])
+
     if noResample:
         coef_mag_0_z = np.polyfit(temp_rel,correction_z, 3)
     else:
@@ -1140,6 +1172,7 @@ if num_mags >= 1 and not math.isnan(sensor_mag_0['temperature'][0]):
     mag_0_params['TC_M0_X2_2'] = coef_mag_0_z[1]
     mag_0_params['TC_M0_X1_2'] = coef_mag_0_z[2]
     mag_0_params['TC_M0_X0_2'] = coef_mag_0_z[3]
+
     fit_coef_mag_0_z = np.poly1d(coef_mag_0_z)
     correction_z_resample = fit_coef_mag_0_z(temp_rel_resample)
 
@@ -1205,6 +1238,7 @@ if num_mags >= 2 and not math.isnan(sensor_mag_1['temperature'][0]):
     mag_1_params['TC_M1_TMIN'] = np.amin(sensor_mag_1['temperature'])
     mag_1_params['TC_M1_TMAX'] = np.amax(sensor_mag_1['temperature'])
     mag_1_params['TC_M1_TREF'] = 0.5 * (mag_1_params['TC_M1_TMIN'] + mag_1_params['TC_M1_TMAX'])
+
     temp_rel = sensor_mag_1['temperature'] - mag_1_params['TC_M1_TREF']
     temp_rel_resample = np.linspace(mag_1_params['TC_M1_TMIN']-mag_1_params['TC_M1_TREF'], mag_1_params['TC_M1_TMAX']-mag_1_params['TC_M1_TREF'], 100)
     temp_resample = temp_rel_resample + mag_1_params['TC_M1_TREF']
@@ -1215,6 +1249,7 @@ if num_mags >= 2 and not math.isnan(sensor_mag_1['temperature'][0]):
 
     # fit X axis
     correction_x = sensor_mag_1['x'] - np.median(sensor_mag_1['x'])
+
     if noResample:
         coef_mag_1_x = np.polyfit(temp_rel, correction_x, 3)
     else:
@@ -1225,11 +1260,13 @@ if num_mags >= 2 and not math.isnan(sensor_mag_1['temperature'][0]):
     mag_1_params['TC_M1_X2_0'] = coef_mag_1_x[1]
     mag_1_params['TC_M1_X1_0'] = coef_mag_1_x[2]
     mag_1_params['TC_M1_X0_0'] = coef_mag_1_x[3]
+
     fit_coef_mag_1_x = np.poly1d(coef_mag_1_x)
     correction_x_resample = fit_coef_mag_1_x(temp_rel_resample)
 
     # fit Y axis
     correction_y = sensor_mag_1['y'] - np.median(sensor_mag_1['y'])
+
     if noResample:
         coef_mag_1_y = np.polyfit(temp_rel,correction_y,3)
     else:
@@ -1240,11 +1277,13 @@ if num_mags >= 2 and not math.isnan(sensor_mag_1['temperature'][0]):
     mag_1_params['TC_M1_X2_1'] = coef_mag_1_y[1]
     mag_1_params['TC_M1_X1_1'] = coef_mag_1_y[2]
     mag_1_params['TC_M1_X0_1'] = coef_mag_1_y[3]
+
     fit_coef_mag_1_y = np.poly1d(coef_mag_1_y)
     correction_y_resample = fit_coef_mag_1_y(temp_rel_resample)
 
     # fit Z axis
     correction_z = sensor_mag_1['z'] - np.median(sensor_mag_1['z'])
+
     if noResample:
         coef_mag_1_z = np.polyfit(temp_rel,correction_z, 3)
     else:
@@ -1255,6 +1294,7 @@ if num_mags >= 2 and not math.isnan(sensor_mag_1['temperature'][0]):
     mag_1_params['TC_M1_X2_2'] = coef_mag_1_z[1]
     mag_1_params['TC_M1_X1_2'] = coef_mag_1_z[2]
     mag_1_params['TC_M1_X0_2'] = coef_mag_1_z[3]
+
     fit_coef_mag_1_z = np.poly1d(coef_mag_1_z)
     correction_z_resample = fit_coef_mag_1_z(temp_rel_resample)
 
@@ -1321,6 +1361,7 @@ if num_mags >= 3 and not math.isnan(sensor_mag_2['temperature'][0]):
     mag_2_params['TC_M2_TMIN'] = np.amin(sensor_mag_2['temperature'])
     mag_2_params['TC_M2_TMAX'] = np.amax(sensor_mag_2['temperature'])
     mag_2_params['TC_M2_TREF'] = 0.5 * (mag_2_params['TC_M2_TMIN'] + mag_2_params['TC_M2_TMAX'])
+
     temp_rel = sensor_mag_2['temperature'] - mag_2_params['TC_M2_TREF']
     temp_rel_resample = np.linspace(mag_2_params['TC_M2_TMIN']-mag_2_params['TC_M2_TREF'], mag_2_params['TC_M2_TMAX']-mag_2_params['TC_M2_TREF'], 100)
     temp_resample = temp_rel_resample + mag_2_params['TC_M2_TREF']
@@ -1331,6 +1372,7 @@ if num_mags >= 3 and not math.isnan(sensor_mag_2['temperature'][0]):
 
     # fit X axis
     correction_x = sensor_mag_2['x'] - np.median(sensor_mag_2['x'])
+
     if noResample:
         coef_mag_2_x = np.polyfit(temp_rel,correction_x, 3)
     else:
@@ -1341,11 +1383,13 @@ if num_mags >= 3 and not math.isnan(sensor_mag_2['temperature'][0]):
     mag_2_params['TC_M2_X2_0'] = coef_mag_2_x[1]
     mag_2_params['TC_M2_X1_0'] = coef_mag_2_x[2]
     mag_2_params['TC_M2_X0_0'] = coef_mag_2_x[3]
+
     fit_coef_mag_2_x = np.poly1d(coef_mag_2_x)
     correction_x_resample = fit_coef_mag_2_x(temp_rel_resample)
 
     # fit Y axis
     correction_y = sensor_mag_2['y'] - np.median(sensor_mag_2['y'])
+
     if noResample:
         coef_mag_2_y = np.polyfit(temp_rel,correction_y,3)
     else:
@@ -1356,11 +1400,13 @@ if num_mags >= 3 and not math.isnan(sensor_mag_2['temperature'][0]):
     mag_2_params['TC_M2_X2_1'] = coef_mag_2_y[1]
     mag_2_params['TC_M2_X1_1'] = coef_mag_2_y[2]
     mag_2_params['TC_M2_X0_1'] = coef_mag_2_y[3]
+
     fit_coef_mag_2_y = np.poly1d(coef_mag_2_y)
     correction_y_resample = fit_coef_mag_2_y(temp_rel_resample)
 
     # fit Z axis
     correction_z = sensor_mag_2['z'] - np.median(sensor_mag_2['z'])
+
     if noResample:
         coef_mag_2_z = np.polyfit(temp_rel,correction_z,3)
     else:
@@ -1371,6 +1417,7 @@ if num_mags >= 3 and not math.isnan(sensor_mag_2['temperature'][0]):
     mag_2_params['TC_M2_X2_2'] = coef_mag_2_z[1]
     mag_2_params['TC_M2_X1_2'] = coef_mag_2_z[2]
     mag_2_params['TC_M2_X0_2'] = coef_mag_2_z[3]
+
     fit_coef_mag_2_z = np.poly1d(coef_mag_2_z)
     correction_z_resample = fit_coef_mag_2_z(temp_rel_resample)
 
@@ -1428,17 +1475,36 @@ mag_3_params = {
 'TC_M3_X3_2':0.0
 }
 
-# curve fit the data for mag 2 corrections
-if num_mags >= 4 and not math.isnan(sensor_mag_3['temperature'][0]):
-    mag_3_params['TC_M3_ID'] = int(np.median(sensor_mag_3['device_id']))
+# curve fit the data for mag 3 corrections
+if num_mags >= 3:
 
-    # find the min, max and reference temperature
-    mag_3_params['TC_M3_TMIN'] = np.amin(sensor_mag_3['temperature'])
-    mag_3_params['TC_M3_TMAX'] = np.amax(sensor_mag_3['temperature'])
-    mag_3_params['TC_M3_TREF'] = 0.5 * (mag_3_params['TC_M3_TMIN'] + mag_3_params['TC_M3_TMAX'])
-    temp_rel = sensor_mag_3['temperature'] - mag_3_params['TC_M3_TREF']
+    mag_3_params['TC_M3_ID'] = int(np.median(sensor_baro_0['device_id']))
+
+    if math.isnan(sensor_mag_3['temperature'][0]):
+
+        # find the min, max and reference temperature
+        mag_3_params['TC_M3_TMIN'] = np.amin(sensor_baro_0['temperature'])
+        mag_3_params['TC_M3_TMAX'] = np.amax(sensor_baro_0['temperature'])
+        mag_3_params['TC_M3_TREF'] = 0.5 * (mag_3_params['TC_M3_TMIN'] + mag_3_params['TC_M3_TMAX'])
+
+        temp_rel = sensor_baro_0['temperature'] - mag_3_params['TC_M3_TREF']
+
+    else:
+        mag_3_params['TC_M3_ID'] = int(np.median(sensor_mag_3['device_id']))
+
+        # find the min, max and reference temperature
+        mag_3_params['TC_M3_TMIN'] = np.amin(sensor_mag_3['temperature'])
+        mag_3_params['TC_M3_TMAX'] = np.amax(sensor_mag_3['temperature'])
+        mag_3_params['TC_M3_TREF'] = 0.5 * (mag_3_params['TC_M3_TMIN'] + mag_3_params['TC_M3_TMAX'])
+
+        temp_rel = sensor_mag_3['temperature'] - mag_3_params['TC_M3_TREF']
+
     temp_rel_resample = np.linspace(mag_3_params['TC_M3_TMIN']-mag_3_params['TC_M3_TREF'], mag_3_params['TC_M3_TMAX']-mag_3_params['TC_M3_TREF'], 100)
-    temp_resample = temp_rel_resample + mag_3_params['TC_M3_TREF']
+    temp_resample     = temp_rel_resample + mag_3_params['TC_M3_TREF']
+
+    # Delete the dataset first and last 10 seconds of data
+    sensor_mag_3 = np.delete(sensor_mag_3, range(0,1000), axis=['x'])
+    sensor_mag_3 = np.delete(sensor_mag_3, range(-1000,), axis=['x'])
 
     sensor_mag_3['x'] = median_filter(sensor_mag_3['x'])
     sensor_mag_3['y'] = median_filter(sensor_mag_3['y'])
@@ -1446,31 +1512,52 @@ if num_mags >= 4 and not math.isnan(sensor_mag_3['temperature'][0]):
 
     # fit X axis
     correction_x = sensor_mag_3['x'] - np.median(sensor_mag_3['x'])
-    coef_mag_3_x = np.polyfit(temp_rel, correction_x, 3)
+
+    if noResample:
+        coef_mag_3_x = np.polyfit(temp_rel,correction_x, 3)
+    else:
+        temp, sens = resampleWithDeltaX(temp_rel,correction_x)
+        coef_mag_3_x = np.polyfit(temp, sens, 3)
+
     mag_3_params['TC_M3_X3_0'] = coef_mag_3_x[0]
     mag_3_params['TC_M3_X2_0'] = coef_mag_3_x[1]
     mag_3_params['TC_M3_X1_0'] = coef_mag_3_x[2]
     mag_3_params['TC_M3_X0_0'] = coef_mag_3_x[3]
+
     fit_coef_mag_3_x = np.poly1d(coef_mag_3_x)
     correction_x_resample = fit_coef_mag_3_x(temp_rel_resample)
 
     # fit Y axis
     correction_y = sensor_mag_3['y'] - np.median(sensor_mag_3['y'])
-    coef_mag_3_y = np.polyfit(temp_rel, correction_y, 3)
+
+    if noResample:
+        coef_mag_3_y = np.polyfit(temp_rel, correction_y, 3)
+    else:
+        temp, sens = resampleWithDeltaX(temp_rel,correction_y)
+        coef_mag_3_y = np.polyfit(temp, sens, 3)
+
     mag_3_params['TC_M3_X3_1'] = coef_mag_3_y[0]
     mag_3_params['TC_M3_X2_1'] = coef_mag_3_y[1]
     mag_3_params['TC_M3_X1_1'] = coef_mag_3_y[2]
     mag_3_params['TC_M3_X0_1'] = coef_mag_3_y[3]
+
     fit_coef_mag_3_y = np.poly1d(coef_mag_3_y)
     correction_y_resample = fit_coef_mag_3_y(temp_rel_resample)
 
     # fit Z axis
     correction_z = sensor_mag_3['z'] - np.median(sensor_mag_3['z'])
-    coef_mag_3_z = np.polyfit(temp_rel, correction_z, 3)
+
+    if noResample:
+        coef_mag_3_z = np.polyfit(temp_rel,correction_z, 3)
+    else:
+        temp, sens = resampleWithDeltaX(temp_rel,correction_z)
+        coef_mag_3_z = np.polyfit(temp, sens, 3)
+
     mag_3_params['TC_M3_X3_2'] = coef_mag_3_z[0]
     mag_3_params['TC_M3_X2_2'] = coef_mag_3_z[1]
     mag_3_params['TC_M3_X1_2'] = coef_mag_3_z[2]
     mag_3_params['TC_M3_X0_2'] = coef_mag_3_z[3]
+
     fit_coef_mag_3_z = np.poly1d(coef_mag_3_z)
     correction_z_resample = fit_coef_mag_3_z(temp_rel_resample)
 
