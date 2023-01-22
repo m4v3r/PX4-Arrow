@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   Copyright (C) 2018 PX4 Development Team. All rights reserved.
+ *   Copyright (c) 2023 PX4 Development Team. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -31,19 +31,46 @@
  *
  ****************************************************************************/
 
-/**
- * @author David Sidrane <david_s5@nscdg.com>
- */
-
 #pragma once
-#if defined(UAVCAN_SOCKETCAN_NUTTX)
-#  include <uavcan_nuttx/uavcan_nuttx.hpp>
-#elif defined(UAVCAN_KINETIS_NUTTX)
-#  include <uavcan_kinetis/uavcan_kinetis.hpp>
-#elif defined(UAVCAN_STM32_NUTTX)
-#  include <uavcan_stm32/uavcan_stm32.hpp>
-#elif defined(UAVCAN_STM32H7_NUTTX)
-#  include <uavcan_stm32h7/uavcan_stm32h7.hpp>
-#else
-#  error "Unsupported driver"
-#endif
+
+#include <lib/mixer_module/mixer_module.hpp>
+
+#include <ignition/transport.hh>
+
+// GZBridge mixing class for Servos.
+// It is separate from GZBridge to have separate WorkItems and therefore allowing independent scheduling
+// All work items are expected to run on the same work queue.
+class GZMixingInterfaceServo : public OutputModuleInterface
+{
+public:
+	GZMixingInterfaceServo(ignition::transport::Node &node, pthread_mutex_t &node_mutex) :
+		OutputModuleInterface(MODULE_NAME "-actuators-servo", px4::wq_configurations::rate_ctrl),
+		_node(node),
+		_node_mutex(node_mutex)
+	{}
+
+	bool updateOutputs(bool stop_motors, uint16_t outputs[MAX_ACTUATORS],
+			   unsigned num_outputs, unsigned num_control_groups_updated) override;
+
+	MixingOutput &mixingOutput() { return _mixing_output; }
+
+	bool init(const std::string &model_name);
+
+	void stop()
+	{
+		_mixing_output.unregister();
+		ScheduleClear();
+	}
+
+private:
+	friend class GZBridge;
+
+	void Run() override;
+
+	ignition::transport::Node &_node;
+	pthread_mutex_t &_node_mutex;
+
+	MixingOutput _mixing_output{"SIM_GZ_SV", MAX_ACTUATORS, *this, MixingOutput::SchedulingPolicy::Auto, false, false};
+
+	//ignition::transport::Node::Publisher _actuators_pub;
+};
