@@ -2,12 +2,6 @@
 #
 # ModalAI FC-v1 specific board sensors init
 #------------------------------------------------------------------------------
-
-if param greater MODAL_IO_CONFIG 0
-then
-	modal_io start
-fi
-
 board_adc start
 
 # Start Digital power monitors
@@ -26,3 +20,6 @@ icm42688p -R 12 -s start
 
 # Internal I2C Baro
 bmp388 -I start
+
+# Start RM3100 compass
+rm3100 -X -b 2 -R 0 start
