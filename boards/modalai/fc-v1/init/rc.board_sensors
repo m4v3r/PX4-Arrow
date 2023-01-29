@@ -21,4 +21,4 @@ icm42688p -R 12 -s start
 bmp388 -I start
 
 # Start RM3100 compass
-rm3100 -X -b 2 -R 0 start
+#rm3100 -X -b 2 -R 0 start
