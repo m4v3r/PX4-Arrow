@@ -42,7 +42,7 @@
 #include <drivers/device/Device.hpp>
 #include <drivers/device/spi.h>
 
-#define HMC5883L_ADDRESS		0x1E
+#define HMC5883L_ADDRESS		0x30
 
 #define ADDR_ID_A			0x0a
 #define ADDR_ID_B			0x0b
