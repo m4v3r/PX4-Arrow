@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   Copyright (c) 2020 PX4 Development Team. All rights reserved.
+ *   Copyright (c) 2023 ModalAI, Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -30,50 +30,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  ****************************************************************************/
+#include <px4_platform_common/log.h>
+#include <uORB/uORBManager.hpp>
 
-#pragma once
-
-#include <cstdint>
-#include <atomic>
-
-#include <px4_platform_common/sem.h>
-
-/**
- * @class LockstepComponents
- * Allows to register components (threads) that need to be updated or waited for in every lockstep cycle (barrier).
- * Registered components need to ensure they poll on topics that is updated in every lockstep cycle.
- */
-class LockstepComponents
+// This function will send a debug or error message up to the apps proc
+// so that it can be displayed and logged. Otherwise the messages are only
+// available with the mini-dm tool that requires adb (i.e. USB cable attached)
+extern "C" void qurt_log_to_apps(int level, const char *message)
 {
-public:
-	LockstepComponents(bool no_cleanup_on_destroy = false);
-	~LockstepComponents();
+	uORBCommunicator::IChannel *ch = uORB::Manager::get_instance()->get_uorb_communicator();
 
-	/**
-	 * Register a component
-	 * @return a valid component ID > 0 or 0 on error (or unsupported)
-	 */
-	int register_component();
-	void unregister_component(int component);
+	if (ch != nullptr) {
+		if (level >= _PX4_LOG_LEVEL_ERROR) { ch->send_message("slpi_error", strlen(message) + 1, (uint8_t *) message); }
 
-	/**
-	 * signal an update from a component
-	 * @param component component ID
-	 */
-	void lockstep_progress(int component);
-
-	/**
-	 * Wait for all registered components to call lockstep_progress()
-	 * Note: only 1 thread can call this
-	 */
-	void wait_for_components();
-
-private:
-	const bool _no_cleanup_on_destroy;
-
-	px4_sem_t _components_sem;
-
-	std::atomic_int _components_used_bitset{0};
-	std::atomic_int _components_progress_bitset{0};
-};
-
+		else { ch->send_message("slpi_debug", strlen(message) + 1, (uint8_t *) message); }
+	}
+}

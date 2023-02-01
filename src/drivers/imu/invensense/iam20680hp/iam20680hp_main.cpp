@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   Copyright (c) 2020 PX4 Development Team. All rights reserved.
+ *   Copyright (c) 2023 PX4 Development Team. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -31,49 +31,58 @@
  *
  ****************************************************************************/
 
-#pragma once
 
-#include <cstdint>
-#include <atomic>
+#include "IAM20680HP.hpp"
 
-#include <px4_platform_common/sem.h>
+#include <px4_platform_common/getopt.h>
+#include <px4_platform_common/module.h>
 
-/**
- * @class LockstepComponents
- * Allows to register components (threads) that need to be updated or waited for in every lockstep cycle (barrier).
- * Registered components need to ensure they poll on topics that is updated in every lockstep cycle.
- */
-class LockstepComponents
+void IAM20680HP::print_usage()
 {
-public:
-	LockstepComponents(bool no_cleanup_on_destroy = false);
-	~LockstepComponents();
+	PRINT_MODULE_USAGE_NAME("iam20680hp", "driver");
+	PRINT_MODULE_USAGE_SUBCATEGORY("imu");
+	PRINT_MODULE_USAGE_COMMAND("start");
+	PRINT_MODULE_USAGE_PARAMS_I2C_SPI_DRIVER(false, true);
+	PRINT_MODULE_USAGE_PARAM_INT('R', 0, 0, 35, "Rotation", true);
+	PRINT_MODULE_USAGE_DEFAULT_COMMANDS();
+}
 
-	/**
-	 * Register a component
-	 * @return a valid component ID > 0 or 0 on error (or unsupported)
-	 */
-	int register_component();
-	void unregister_component(int component);
+extern "C" int iam20680hp_main(int argc, char *argv[])
+{
+	int ch;
+	using ThisDriver = IAM20680HP;
+	BusCLIArguments cli{false, true};
+	cli.default_spi_frequency = SPI_SPEED;
 
-	/**
-	 * signal an update from a component
-	 * @param component component ID
-	 */
-	void lockstep_progress(int component);
+	while ((ch = cli.getOpt(argc, argv, "R:")) != EOF) {
+		switch (ch) {
+		case 'R':
+			cli.rotation = (enum Rotation)atoi(cli.optArg());
+			break;
+		}
+	}
 
-	/**
-	 * Wait for all registered components to call lockstep_progress()
-	 * Note: only 1 thread can call this
-	 */
-	void wait_for_components();
+	const char *verb = cli.optArg();
 
-private:
-	const bool _no_cleanup_on_destroy;
+	if (!verb) {
+		ThisDriver::print_usage();
+		return -1;
+	}
 
-	px4_sem_t _components_sem;
+	BusInstanceIterator iterator(MODULE_NAME, cli, DRV_IMU_DEVTYPE_IAM20680HP);
 
-	std::atomic_int _components_used_bitset{0};
-	std::atomic_int _components_progress_bitset{0};
-};
+	if (!strcmp(verb, "start")) {
+		return ThisDriver::module_start(cli, iterator);
+	}
 
+	if (!strcmp(verb, "stop")) {
+		return ThisDriver::module_stop(iterator);
+	}
+
+	if (!strcmp(verb, "status")) {
+		return ThisDriver::module_status(iterator);
+	}
+
+	ThisDriver::print_usage();
+	return -1;
+}

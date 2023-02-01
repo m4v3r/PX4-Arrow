@@ -1,6 +1,6 @@
 ############################################################################
 #
-#   Copyright (c) 2022 ModalAI, Inc. All rights reserved.
+#   Copyright (c) 2023 PX4 Development Team. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -31,18 +31,17 @@
 #
 ############################################################################
 
-# Placeholder
-set(QURT_LAYER_SRCS
-	drv_hrt.cpp
-	tasks.cpp
-	px4_qurt_impl.cpp
-	main.cpp
-	qurt_log.cpp
+px4_add_module(
+	MODULE drivers__imu__invensense__iam20680hp
+	MAIN iam20680hp
+	COMPILE_FLAGS
+	SRCS
+		IAM20680HP.cpp
+		IAM20680HP.hpp
+		iam20680hp_main.cpp
+		InvenSense_IAM20680HP_registers.hpp
+	DEPENDS
+		drivers_accelerometer
+		drivers_gyroscope
+		px4_work_queue
 	)
-
-add_library(px4_layer
-        ${QURT_LAYER_SRCS}
-)
-
-target_link_libraries(px4_layer PRIVATE work_queue)
-target_link_libraries(px4_layer PRIVATE drivers_board)
