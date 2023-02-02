@@ -14,10 +14,10 @@ board_adc start
 voxlpm -X -b 3 -k -T VBATT start
 voxlpm -X -b 3 -T P5VDC start
 
-# Internal SPI bus ICM-20602
-#icm20602 -R 12 -s start
+# Internal SPI1 ICM-20602
+icm20602 -R 12 -s start
 
-# Internal SPI bus ICM-42688
+# Internal SPI2 ICM-42688
 icm42688p -R 12 -s start
 
 # Internal SPI4 BMI088
@@ -26,3 +26,6 @@ icm42688p -R 12 -s start
 
 # Internal I2C Baro
 bmp388 -I start
+
+# GPS LED
+rgbled_ncp5623c start -X -a 0x38
