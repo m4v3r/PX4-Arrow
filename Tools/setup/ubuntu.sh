@@ -84,6 +84,7 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get -y --quiet --no-install-recommends i
 	gdb \
 	git \
 	lcov \
+	libfuse2 \ # QGroundControl AppImage requirement
 	libxml2-dev \
 	libxml2-utils \
 	make \
@@ -182,6 +183,7 @@ if [[ $INSTALL_NUTTX == "true" ]]; then
 			echo "${NUTTX_GCC_VERSION} path already set.";
 		else
 			echo $exportline >> $HOME/.profile;
+			source $HOME/.profile; # Allows to directly build NuttX targets in the same terminal
 		fi
 	fi
 fi
@@ -217,12 +219,14 @@ if [[ $INSTALL_SIM == "true" ]]; then
 	# Set Java 11 as default
 	sudo update-alternatives --set java $(update-alternatives --list java | grep "java-$java_version")
 
+	# Add Gazebo binary repository
+	sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
+	wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
+	# Update list, since new gazebo-stable.list has been added
+	sudo apt-get update -y --quiet
+
 	# Install Gazebo
 	if [[ "${UBUNTU_RELEASE}" == "22.04" ]]; then
-		sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
-		wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
-		# Update list, since new gazebo-stable.list has been added
-		sudo apt-get update -y --quiet
 		sudo DEBIAN_FRONTEND=noninteractive apt-get -y --quiet --no-install-recommends install \
 			ignition-fortress \
 			;
@@ -240,10 +244,6 @@ if [[ $INSTALL_SIM == "true" ]]; then
 		gazebo_packages="gazebo$gazebo_version libgazebo$gazebo_version-dev"
 	fi
 
-	sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
-	wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
-	# Update list, since new gazebo-stable.list has been added
-	sudo apt-get update -y --quiet
 	sudo DEBIAN_FRONTEND=noninteractive apt-get -y --quiet --no-install-recommends install \
 		dmidecode \
 		$gazebo_packages \
