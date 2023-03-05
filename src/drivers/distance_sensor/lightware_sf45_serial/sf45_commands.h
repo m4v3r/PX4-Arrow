@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   Copyright (c) 2020-2023 PX4 Development Team. All rights reserved.
+ *   Copyright (c) 2022-2023 PX4 Development Team. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -31,37 +31,59 @@
  *
  ****************************************************************************/
 
-#include "StickYaw.hpp"
+/**
+ * @file sf45_commands.h
+ * @author Andrew Brahim
+ *
+ * Declarations of sf45 serial commands for the Lightware sf45/b series
+ */
 
-#include <px4_platform_common/defines.h>
+#pragma once
+#define SF45_MAX_PAYLOAD 256
+#define SF45_CRC_FIELDS 2
 
-StickYaw::StickYaw(ModuleParams *parent) :
-	ModuleParams(parent)
-{}
+enum SF_SERIAL_CMD {
+	SF_PRODUCT_NAME = 0,
+	SF_HARDWARE_VERSION = 1,
+	SF_FIRMWARE_VERSION = 2,
+	SF_SERIAL_NUMBER = 3,
+	SF_TEXT_MESSAGE = 7,
+	SF_USER_DATA = 9,
+	SF_TOKEN = 10,
+	SF_SAVE_PARAMETERS = 12,
+	SF_RESET = 14,
+	SF_STAGE_FIRMWARE = 16,
+	SF_COMMIT_FIRMWARE = 17,
+	SF_DISTANCE_OUTPUT = 27,
+	SF_STREAM = 30,
+	SF_DISTANCE_DATA_CM = 44,
+	SF_DISTANCE_DATA_MM = 45,
+	SF_LASER_FIRING = 50,
+	SF_TEMPERATURE = 57,
+	SF_UPDATE_RATE = 66,
+	SF_NOISE = 74,
+	SF_ZERO_OFFSET = 75,
+	SF_LOST_SIGNAL_COUNTER = 76,
+	SF_BAUD_RATE = 79,
+	SF_I2C_ADDRESS = 80,
+	SF_SCAN_SPEED = 85,
+	SF_STEPPER_STATUS = 93,
+	SF_SCAN_ON_STARTUP = 94,
+	SF_SCAN_ENABLE = 96,
+	SF_SCAN_POSITION = 97,
+	SF_SCAN_LOW_ANGLE = 98,
+	SF_HIGH_ANGLE = 99
+};
 
-void StickYaw::generateYawSetpoint(float &yawspeed_setpoint, float &yaw_setpoint, const float stick_yaw,
-				   const float yaw, const bool is_yaw_good_for_control, const float deltatime)
-{
-	_yawspeed_filter.setParameters(deltatime, _param_mpc_man_y_tau.get());
-	yawspeed_setpoint = _yawspeed_filter.update(stick_yaw * math::radians(_param_mpc_man_y_max.get()));
-	yaw_setpoint = updateYawLock(yaw, yawspeed_setpoint, yaw_setpoint, is_yaw_good_for_control);
-}
-
-float StickYaw::updateYawLock(const float yaw, const float yawspeed_setpoint, const float yaw_setpoint,
-			      const bool is_yaw_good_for_control)
-{
-	// Yaw-lock depends on desired yawspeed input. If not locked, yaw_sp is set to NAN.
-	if ((fabsf(yawspeed_setpoint) > FLT_EPSILON) || !is_yaw_good_for_control) {
-		// no fixed heading when rotating around yaw by stick
-		return NAN;
-
-	} else {
-		// break down and hold the current heading when no more rotation commanded
-		if (!PX4_ISFINITE(yaw_setpoint)) {
-			return yaw;
-
-		} else {
-			return yaw_setpoint;
-		}
-	}
-}
+// Store contents of rx'd frame
+struct {
+	const uint8_t data_fields = 2; // useful for breaking crc's into byte separated fields
+	uint16_t data_len{0};   // last message payload length (1+ bytes in payload)
+	uint8_t data[SF45_MAX_PAYLOAD];   // payload size limited by posix serial
+	uint8_t msg_id{0};          // latest message's message id
+	uint8_t flags_lo{0};      // flags low byte
+	uint8_t flags_hi{0};     // flags high byte
+	uint16_t crc[SF45_CRC_FIELDS] = {0, 0};
+	uint8_t crc_lo{0};        // crc low byte
+	uint8_t crc_hi{0};       // crc high byte
+} rx_field;
