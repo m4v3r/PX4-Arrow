@@ -1,6 +1,6 @@
 ############################################################################
 #
-#   Copyright (c) 2018-2023 PX4 Development Team. All rights reserved.
+#   Copyright (c) 2022-2023 PX4 Development Team. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -30,10 +30,21 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 ############################################################################
+px4_add_module(
+	MODULE drivers__distance_sensor__lightware_sf45_serial
+	MAIN lightware_sf45_serial
+	COMPILE_FLAGS
+	SRCS
+		lightware_sf45_serial.cpp
+		lightware_sf45_serial.hpp
+		lightware_sf45_serial_main.cpp
+	DEPENDS
+		drivers_rangefinder
+		px4_work_queue
+	MODULE_CONFIG
+		module.yaml
+	)
 
-px4_add_library(FlightTaskAuto
-	FlightTaskAuto.cpp
-)
-
-target_link_libraries(FlightTaskAuto PUBLIC avoidance FlightTask FlightTaskUtility WeatherVane)
-target_include_directories(FlightTaskAuto PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+if(PX4_TESTING)
+	add_subdirectory(tests)
+endif()

@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   Copyright (c) 2020-2023 PX4 Development Team. All rights reserved.
+ *   Copyright (c) 2023 PX4 Development Team. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -31,37 +31,42 @@
  *
  ****************************************************************************/
 
-#include "StickYaw.hpp"
+/**
+ * @file StickTiltXY.hpp
+ * @brief Generate only horizontal acceleration setpoint from stick input
+ * @author Matthias Grob <maetugr@gmail.com>
+ */
 
-#include <px4_platform_common/defines.h>
+#pragma once
 
-StickYaw::StickYaw(ModuleParams *parent) :
-	ModuleParams(parent)
-{}
+#include <lib/mathlib/math/filter/AlphaFilter.hpp>
+#include <matrix/math.hpp>
+#include <px4_platform_common/module_params.h>
 
-void StickYaw::generateYawSetpoint(float &yawspeed_setpoint, float &yaw_setpoint, const float stick_yaw,
-				   const float yaw, const bool is_yaw_good_for_control, const float deltatime)
+class StickTiltXY : public ModuleParams
 {
-	_yawspeed_filter.setParameters(deltatime, _param_mpc_man_y_tau.get());
-	yawspeed_setpoint = _yawspeed_filter.update(stick_yaw * math::radians(_param_mpc_man_y_max.get()));
-	yaw_setpoint = updateYawLock(yaw, yawspeed_setpoint, yaw_setpoint, is_yaw_good_for_control);
-}
+public:
+	StickTiltXY(ModuleParams *parent);
+	~StickTiltXY() = default;
 
-float StickYaw::updateYawLock(const float yaw, const float yawspeed_setpoint, const float yaw_setpoint,
-			      const bool is_yaw_good_for_control)
-{
-	// Yaw-lock depends on desired yawspeed input. If not locked, yaw_sp is set to NAN.
-	if ((fabsf(yawspeed_setpoint) > FLT_EPSILON) || !is_yaw_good_for_control) {
-		// no fixed heading when rotating around yaw by stick
-		return NAN;
+	/**
+	 * Produce acceleration setpoint to tilt a multicopter based on stick input
+	 *
+	 * Forward pitch stick input pitches the vehicle's pitch e.g. accelerates the vehicle in its nose direction.
+	 *
+	 * @param stick_xy the raw pitch and roll stick positions as input
+	 * @param dt time in seconds since the last execution
+	 * @param yaw the current yaw estimate for frame rotation
+	 * @param yaw_setpoint the current heading setpoint used instead of the estimate if absolute yaw is locked
+	 * @return NED frame horizontal x, y axis acceleration setpoint
+	 */
+	matrix::Vector2f generateAccelerationSetpoints(matrix::Vector2f stick_xy, const float dt, const float yaw,
+			const float yaw_setpoint);
+private:
+	AlphaFilter<matrix::Vector2f> _man_input_filter;
 
-	} else {
-		// break down and hold the current heading when no more rotation commanded
-		if (!PX4_ISFINITE(yaw_setpoint)) {
-			return yaw;
-
-		} else {
-			return yaw_setpoint;
-		}
-	}
-}
+	DEFINE_PARAMETERS(
+		(ParamFloat<px4::params::MPC_MAN_TILT_MAX>) _param_mpc_man_tilt_max, ///< maximum tilt allowed for manual flight
+		(ParamFloat<px4::params::MC_MAN_TILT_TAU>) _param_mc_man_tilt_tau ///< time constant for stick filter
+	)
+};
