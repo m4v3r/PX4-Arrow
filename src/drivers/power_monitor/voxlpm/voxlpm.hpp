@@ -166,7 +166,7 @@ using namespace time_literals;
  * VOXLPM v3 - Coniguration from SBOS644C –FEBRUARY 2013–REVISED MARCH 2018
  *             http://www.ti.com/lit/ds/symlink/ina231.pdf
  */
-#define VOXLPM_INA231_ADDR_VBATT		0x49
+#define VOXLPM_INA231_ADDR_VBATT		0x44
 #define VOXLPM_INA231_ADDR_P5_12VDC		0x45
 
 /* INA231 Registers addresses */
