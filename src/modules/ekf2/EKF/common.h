@@ -70,7 +70,8 @@ static constexpr uint64_t BARO_MAX_INTERVAL     = 200e3;  ///< Maximum allowable
 static constexpr uint64_t EV_MAX_INTERVAL       = 200e3;  ///< Maximum allowable time interval between external vision system measurements (uSec)
 static constexpr uint64_t GNSS_MAX_INTERVAL     = 500e3;  ///< Maximum allowable time interval between GNSS measurements (uSec)
 static constexpr uint64_t GNSS_YAW_MAX_INTERVAL = 1500e3; ///< Maximum allowable time interval between GNSS yaw measurements (uSec)
-static constexpr uint64_t RNG_MAX_INTERVAL      = 200e3;  ///< Maximum allowable time interval between range finder  measurements (uSec)
+static constexpr uint64_t RNG_MAX_INTERVAL      = 200e3;  ///< Maximum allowable time interval between range finder measurements (uSec)
+static constexpr uint64_t MAG_MAX_INTERVAL      = 500e3;  ///< Maximum allowable time interval between magnetic field measurements (uSec)
 
 // bad accelerometer detection and mitigation
 static constexpr uint64_t BADACC_PROBATION = 10e6; ///< Period of time that accel data declared bad must continuously pass checks to be declared good again (uSec)
@@ -354,7 +355,7 @@ struct parameters {
 	int32_t mag_declination_source{7};      ///< bitmask used to control the handling of declination data
 	int32_t mag_fusion_type{0};             ///< integer used to specify the type of magnetometer fusion used
 	float mag_acc_gate{0.5f};               ///< when in auto select mode, heading fusion will be used when manoeuvre accel is lower than this (m/sec**2)
-	float mag_yaw_rate_gate{0.25f};         ///< yaw rate threshold used by mode select logic (rad/sec)
+	float mag_yaw_rate_gate{0.20f};         ///< yaw rate threshold used by mode select logic (rad/sec)
 
 	// GNSS heading fusion
 	float gps_heading_noise{0.1f};          ///< measurement noise standard deviation used for GNSS heading fusion (rad)
