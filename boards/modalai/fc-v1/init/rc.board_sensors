@@ -7,17 +7,17 @@ board_adc start
 
 # Start Digital power monitors
 voxlpm -X -b 3 -k -T VBATT start
-#voxlpm -X -b 3 -T P5VDC start
+voxlpm -X -b 3 -T P5VDC start
+
+# Internal SPI-1 ICM-20602
+#icm20602 -s -R 12 start
+
+# Internal SPI-6 BMI088
+bmi088 -s -A -R 12 start
+bmi088 -s -G -R 12 start
 
 # Internal SPI-2 ICM-42688p
 icm42688p -s -R 12 start
-
-# Internal SPI-1 ICM-20602
-icm20602 -s -R 12 start
-
-# Internal SPI-6 BMI088
-#bmi088 -s -A -R 12 start
-#bmi088 -s -G -R 12 start
 
 # External I2C-4 Baro
 bmp388 -I start
