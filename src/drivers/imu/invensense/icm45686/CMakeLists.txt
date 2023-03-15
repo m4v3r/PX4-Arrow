@@ -1,6 +1,6 @@
 ############################################################################
 #
-#   Copyright (c) 2015 PX4 Development Team. All rights reserved.
+#   Copyright (c) 2023 PX4 Development Team. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -31,13 +31,18 @@
 #
 ############################################################################
 px4_add_module(
-	MODULE drivers__roboclaw
-	MAIN roboclaw
+	MODULE drivers__imu__invensense__icm45686
+	MAIN icm45686
 	COMPILE_FLAGS
+		${MAX_CUSTOM_OPT_LEVEL}
+		#-DDEBUG_BUILD
 	SRCS
-		roboclaw_main.cpp
-		RoboClaw.cpp
-	MODULE_CONFIG
-		module.yaml
+		icm45686_main.cpp
+		ICM45686.cpp
+		ICM45686.hpp
+		InvenSense_ICM45686_registers.hpp
+	DEPENDS
+		px4_work_queue
+		drivers_accelerometer
+		drivers_gyroscope
 	)
-

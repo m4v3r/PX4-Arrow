@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   Copyright (c) 2015 PX4 Development Team. All rights reserved.
+ *   Copyright (c) 2022 PX4 Development Team. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -32,24 +32,50 @@
  ****************************************************************************/
 
 /**
- * @file tailsitter_params.c
- * Parameters for vtol attitude controller.
+ * @file arming_status.cpp
  *
- * @author Roman Bapst <bapstroman@gmail.com>
- * @author David Vorsin     <davidvorsin@gmail.com>
+ * @author Alex Klimaj <alex@arkelectron.com>
  */
 
-/**
- * Duration of front transition phase 2
- *
- * Time in seconds it should take for the rotors to rotate forward completely from the point
- * when the plane has picked up enough airspeed and is ready to go into fixed wind mode.
- *
- * @unit s
- * @min 0.1
- * @max 5.0
- * @increment 0.01
- * @decimal 3
- * @group VTOL Attitude Control
+#include "arming_status.hpp"
 
-PARAM_DEFINE_FLOAT(VT_TRANS_P2_DUR, 0.5f);*/
+UavcanArmingStatus::UavcanArmingStatus(uavcan::INode &node) :
+	_arming_status_pub(node),
+	_timer(node)
+{
+	_arming_status_pub.setPriority(uavcan::TransferPriority::Default);
+}
+
+int UavcanArmingStatus::init()
+{
+	/*
+	 * Setup timer and call back function for periodic updates
+	 */
+	if (!_timer.isRunning()) {
+		_timer.setCallback(TimerCbBinder(this, &UavcanArmingStatus::periodic_update));
+		_timer.startPeriodic(uavcan::MonotonicDuration::fromMSec(1000 / MAX_RATE_HZ));
+	}
+
+	return 0;
+}
+
+void UavcanArmingStatus::periodic_update(const uavcan::TimerEvent &)
+{
+	actuator_armed_s actuator_armed;
+
+	if (_actuator_armed_sub.update(&actuator_armed)) {
+		uavcan::equipment::safety::ArmingStatus cmd;
+
+		if (actuator_armed.lockdown || actuator_armed.manual_lockdown) {
+			cmd.status = cmd.STATUS_DISARMED;
+
+		} else if (actuator_armed.armed || actuator_armed.prearmed) {
+			cmd.status = cmd.STATUS_FULLY_ARMED;
+
+		} else {
+			cmd.status = cmd.STATUS_DISARMED;
+		}
+
+		(void)_arming_status_pub.broadcast(cmd);
+	}
+}
