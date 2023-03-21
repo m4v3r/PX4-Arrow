@@ -90,17 +90,23 @@ public:
 
 	void setBaroData(const baroSample &baro_sample);
 
+#if defined(CONFIG_EKF2_AIRSPEED)
 	void setAirspeedData(const airspeedSample &airspeed_sample);
+#endif // CONFIG_EKF2_AIRSPEED
 
 	void setRangeData(const rangeSample &range_sample);
 
 	// if optical flow sensor gyro delta angles are not available, set gyro_xyz vector fields to NaN and the EKF will use its internal delta angle data instead
 	void setOpticalFlowData(const flowSample &flow);
 
+#if defined(CONFIG_EKF2_EXTERNAL_VISION)
 	// set external vision position and attitude data
 	void setExtVisionData(const extVisionSample &evdata);
+#endif // CONFIG_EKF2_EXTERNAL_VISION
 
+#if defined(CONFIG_EKF2_AUXVEL)
 	void setAuxVelData(const auxVelSample &auxvel_sample);
+#endif // CONFIG_EKF2_AUXVEL
 
 	void setSystemFlagData(const systemFlagUpdate &system_flags);
 
@@ -291,10 +297,16 @@ protected:
 	// measurement samples capturing measurements on the delayed time horizon
 	gpsSample _gps_sample_delayed{};
 	sensor::SensorRangeFinder _range_sensor{};
+
+#if defined(CONFIG_EKF2_AIRSPEED)
 	airspeedSample _airspeed_sample_delayed{};
+#endif // CONFIG_EKF2_AIRSPEED
+
 	flowSample _flow_sample_delayed{};
+
+#if defined(CONFIG_EKF2_EXTERNAL_VISION)
 	extVisionSample _ev_sample_prev{};
-	dragSample _drag_down_sampled{};	// down sampled drag specific force data (filter prediction rate -> observation rate)
+#endif // CONFIG_EKF2_EXTERNAL_VISION
 
 	RangeFinderConsistencyCheck _rng_consistency_check;
 
@@ -314,13 +326,21 @@ protected:
 	MapProjection _pos_ref{}; // Contains WGS-84 position latitude and longitude of the EKF origin
 	MapProjection _gps_pos_prev{}; // Contains WGS-84 position latitude and longitude of the previous GPS message
 	float _gps_alt_prev{0.0f};	// height from the previous GPS message (m)
+#if defined(CONFIG_EKF2_GNSS_YAW)
 	float _gps_yaw_offset{0.0f};	// Yaw offset angle for dual GPS antennas used for yaw estimation (radians).
-
 	// innovation consistency check monitoring ratios
 	AlphaFilter<float> _gnss_yaw_signed_test_ratio_lpf{0.1f}; // average signed test ratio used to detect a bias in the state
+	uint64_t _time_last_gps_yaw_buffer_push{0};
+#endif // CONFIG_EKF2_GNSS_YAW
 
 	float _hagl_test_ratio{};		// height above terrain measurement innovation consistency check ratio
+
+#if defined(CONFIG_EKF2_DRAG_FUSION)
+	RingBuffer<dragSample> *_drag_buffer{nullptr};
+	dragSample _drag_down_sampled{};	// down sampled drag specific force data (filter prediction rate -> observation rate)
 	Vector2f _drag_test_ratio{};		// drag innovation consistency check ratio
+#endif // CONFIG_EKF2_DRAG_FUSION
+
 	innovation_fault_status_u _innov_check_fail_status{};
 
 	bool _horizontal_deadreckon_time_exceeded{true};
@@ -342,19 +362,24 @@ protected:
 	RingBuffer<magSample> *_mag_buffer{nullptr};
 	RingBuffer<baroSample> *_baro_buffer{nullptr};
 	RingBuffer<rangeSample> *_range_buffer{nullptr};
+#if defined(CONFIG_EKF2_AIRSPEED)
 	RingBuffer<airspeedSample> *_airspeed_buffer{nullptr};
+#endif // CONFIG_EKF2_AIRSPEED
 	RingBuffer<flowSample> 	*_flow_buffer{nullptr};
+
+#if defined(CONFIG_EKF2_EXTERNAL_VISION)
 	RingBuffer<extVisionSample> *_ext_vision_buffer{nullptr};
-	RingBuffer<dragSample> *_drag_buffer{nullptr};
+	uint64_t _time_last_ext_vision_buffer_push{0};
+#endif // CONFIG_EKF2_EXTERNAL_VISION
+#if defined(CONFIG_EKF2_AUXVEL)
 	RingBuffer<auxVelSample> *_auxvel_buffer{nullptr};
+#endif // CONFIG_EKF2_AUXVEL
 	RingBuffer<systemFlagUpdate> *_system_flag_buffer{nullptr};
 
 	uint64_t _time_last_gps_buffer_push{0};
-	uint64_t _time_last_gps_yaw_buffer_push{0};
 	uint64_t _time_last_mag_buffer_push{0};
 	uint64_t _time_last_baro_buffer_push{0};
 	uint64_t _time_last_range_buffer_push{0};
-	uint64_t _time_last_ext_vision_buffer_push{0};
 
 	uint64_t _time_last_gnd_effect_on{0};
 
@@ -380,16 +405,18 @@ protected:
 
 private:
 
-	inline void setDragData(const imuSample &imu);
+#if defined(CONFIG_EKF2_DRAG_FUSION)
+	void setDragData(const imuSample &imu);
+
+	// Used by the multi-rotor specific drag force fusion
+	uint8_t _drag_sample_count{0};	// number of drag specific force samples assumulated at the filter prediction rate
+	float _drag_sample_time_dt{0.0f};	// time integral across all samples used to form _drag_down_sampled (sec)
+#endif // CONFIG_EKF2_DRAG_FUSION
 
 	void printBufferAllocationFailed(const char *buffer_name);
 
 	ImuDownSampler _imu_down_sampler{_params.filter_update_interval_us};
 
 	unsigned _min_obs_interval_us{0}; // minimum time interval between observations that will guarantee data is not lost (usec)
-
-	// Used by the multi-rotor specific drag force fusion
-	uint8_t _drag_sample_count{0};	// number of drag specific force samples assumulated at the filter prediction rate
-	float _drag_sample_time_dt{0.0f};	// time integral across all samples used to form _drag_down_sampled (sec)
 };
 #endif // !EKF_ESTIMATOR_INTERFACE_H

@@ -116,26 +116,37 @@ void Ekf::reset()
 
 	resetEstimatorAidStatus(_aid_src_baro_hgt);
 	resetEstimatorAidStatus(_aid_src_rng_hgt);
+#if defined(CONFIG_EKF2_AIRSPEED)
 	resetEstimatorAidStatus(_aid_src_airspeed);
+#endif // CONFIG_EKF2_AIRSPEED
+#if defined(CONFIG_EKF2_SIDESLIP)
 	resetEstimatorAidStatus(_aid_src_sideslip);
+#endif // CONFIG_EKF2_SIDESLIP
 
 	resetEstimatorAidStatus(_aid_src_fake_pos);
 	resetEstimatorAidStatus(_aid_src_fake_hgt);
 
+#if defined(CONFIG_EKF2_EXTERNAL_VISION)
 	resetEstimatorAidStatus(_aid_src_ev_hgt);
 	resetEstimatorAidStatus(_aid_src_ev_pos);
 	resetEstimatorAidStatus(_aid_src_ev_vel);
 	resetEstimatorAidStatus(_aid_src_ev_yaw);
+#endif // CONFIG_EKF2_EXTERNAL_VISION
 
 	resetEstimatorAidStatus(_aid_src_gnss_hgt);
 	resetEstimatorAidStatus(_aid_src_gnss_pos);
 	resetEstimatorAidStatus(_aid_src_gnss_vel);
+
+#if defined(CONFIG_EKF2_GNSS_YAW)
 	resetEstimatorAidStatus(_aid_src_gnss_yaw);
+#endif // CONFIG_EKF2_GNSS_YAW
 
 	resetEstimatorAidStatus(_aid_src_mag_heading);
 	resetEstimatorAidStatus(_aid_src_mag);
 
+#if defined(CONFIG_EKF2_AUXVEL)
 	resetEstimatorAidStatus(_aid_src_aux_vel);
+#endif // CONFIG_EKF2_AUXVEL
 
 	resetEstimatorAidStatus(_aid_src_optical_flow);
 	resetEstimatorAidStatus(_aid_src_terrain_optical_flow);

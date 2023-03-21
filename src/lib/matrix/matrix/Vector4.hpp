@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   Copyright (C) 2022 PX4 Development Team. All rights reserved.
+ *   Copyright (C) 2023 PX4 Development Team. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -31,53 +31,65 @@
  *
  ****************************************************************************/
 
-#include <gtest/gtest.h>
-#include <matrix/math.hpp>
+/**
+ * @file Vector4.hpp
+ *
+ * 4D vector class.
+ *
+ * @author Matthias Grob <maetugr@gmail.com>
+ */
 
-using namespace matrix;
+#pragma once
 
-TEST(MatrixVector3Test, Vector3)
+#include "math.hpp"
+
+namespace matrix
 {
-	Vector3f a(1, 0, 0);
-	Vector3f b(0, 1, 0);
-	Vector3f c = a.cross(b);
-	EXPECT_EQ(c, Vector3f(0, 0, 1));
-	c = a % b;
-	EXPECT_EQ(c, Vector3f(0, 0, 1));
-	Matrix<float, 3, 1> d(c);
-	Vector3f e(d);
-	EXPECT_EQ(e, d);
-	float data[] = {4, 5, 6};
-	Vector3f f(data);
-	EXPECT_EQ(f, Vector3f(4, 5, 6));
 
-	EXPECT_EQ(a + b, Vector3f(1, 1, 0));
-	EXPECT_EQ(a - b, Vector3f(1, -1, 0));
-	EXPECT_FLOAT_EQ(a * b, 0.0f);
-	EXPECT_EQ(-a, Vector3f(-1, 0, 0));
-	EXPECT_EQ(a.unit(), a);
-	EXPECT_EQ(a.unit(), a.normalized());
-	EXPECT_EQ(a * 2.0, Vector3f(2, 0, 0));
+template <typename Type, size_t M, size_t N>
+class Matrix;
 
-	Vector2f g2(1, 3);
-	Vector3f g3(7, 11, 17);
-	g3.xy() = g2;
-	EXPECT_EQ(g3, Vector3f(1, 3, 17));
+template <typename Type, size_t M>
+class Vector;
 
-	const Vector3f g4(g3);
-	Vector2f g5 = g4.xy();
-	EXPECT_EQ(g5, g2);
-	EXPECT_EQ(g2, Vector2f(g4.xy()));
+template<typename Type>
+class Vector4 : public Vector<Type, 4>
+{
+public:
+	using Matrix41 = Matrix<Type, 4, 1>;
 
-	Vector3f h;
-	EXPECT_EQ(h, Vector3f(0, 0, 0));
-	Vector4f j(1.f, 2.f, 3.f, 4.f);
-	Vector3f k = j.slice<3, 1>(0, 0);
-	Vector3f k_test(1, 2, 3);
-	EXPECT_EQ(k, k_test);
+	Vector4() = default;
 
-	Vector3f m1(1, 2, 3);
-	Vector3f m2(3.1f, 4.1f, 5.1f);
-	EXPECT_EQ(m2, m1 + 2.1f);
-	EXPECT_EQ(m2 - 2.1f, m1);
-}
+	Vector4(const Matrix41 &other) :
+		Vector<Type, 4>(other)
+	{
+	}
+
+	explicit Vector4(const Type data_[3]) :
+		Vector<Type, 4>(data_)
+	{
+	}
+
+	Vector4(Type x1, Type x2, Type x3, Type x4)
+	{
+		Vector4 &v(*this);
+		v(0) = x1;
+		v(1) = x2;
+		v(2) = x3;
+		v(3) = x4;
+	}
+
+	template<size_t P, size_t Q>
+	Vector4(const Slice<Type, 4, 1, P, Q> &slice_in) : Vector<Type, 4>(slice_in)
+	{
+	}
+
+	template<size_t P, size_t Q>
+	Vector4(const Slice<Type, 1, 4, P, Q> &slice_in) : Vector<Type, 4>(slice_in)
+	{
+	}
+};
+
+using Vector4f = Vector4<float>;
+
+} // namespace matrix
