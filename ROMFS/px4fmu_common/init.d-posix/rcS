@@ -46,7 +46,7 @@ then
 elif [ "$PX4_SIM_MODEL" = "none" ] || [ -z $PX4_SIM_MODEL ]
 then
 	# no airframe selected
-	SYS_AUTOSTART=0
+	SYS_AUTOSTART=10040
 
 elif [ -n "$PX4_SIM_MODEL" ]
 then
