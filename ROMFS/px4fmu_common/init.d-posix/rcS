@@ -32,7 +32,7 @@ set LOGGER_BUF                  1000
 
 set RUN_MINIMAL_SHELL           no
 
-set SYS_AUTOSTART=10040
+set SYS_AUTOSTART=0
 
 if [ "$PX4_SIM_MODEL" = "shell" ]
 then
@@ -46,7 +46,7 @@ then
 elif [ "$PX4_SIM_MODEL" = "none" ] || [ -z $PX4_SIM_MODEL ]
 then
 	# no airframe selected
-	SYS_AUTOSTART=10040
+	SYS_AUTOSTART=0
 
 elif [ -n "$PX4_SIM_MODEL" ]
 then
