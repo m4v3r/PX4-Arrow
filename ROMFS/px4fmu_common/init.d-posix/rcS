@@ -32,7 +32,7 @@ set LOGGER_BUF                  1000
 
 set RUN_MINIMAL_SHELL           no
 
-set SYS_AUTOSTART=4001
+set SYS_AUTOSTART=10040
 
 if [ "$PX4_SIM_MODEL" = "shell" ]
 then
