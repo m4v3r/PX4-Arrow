@@ -109,3 +109,4 @@ src/systemcmds/topic_listener/listener_generated.cpp
 PX4-Arrow.code-workspace
 src/modules/micrortps_bridge/micro-CDR
 src/modules/micrortps_bridge/micro-CDR
+src/modules/micrortps_bridge/micro-CDR
