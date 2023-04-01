@@ -123,7 +123,7 @@ then
 	param set SENS_DPRES_OFF 0.001
 fi
 
-param set-default BAT1_N_CELLS 4
+param set-default BAT_N_CELLS 4
 
 param set-default CBRK_AIRSPD_CHK 0
 param set-default CBRK_SUPPLY_CHK 894281
@@ -132,13 +132,13 @@ param set-default CBRK_SUPPLY_CHK 894281
 param set-default COM_CPU_MAX -1
 
 # Don't require RC calibration and configuration
-param set-default COM_RC_IN_MODE 1
+param set-default COM_RC_IN_MODE 2
 
 # Speedup SITL startup
 param set-default EKF2_REQ_GPS_H 0.5
 
 # Multi-EKF
-param set-default EKF2_MULTI_IMU 3
+param set-default EKF2_MULTI_IMU 2
 param set-default SENS_IMU_MODE 0
 param set-default EKF2_MULTI_MAG 2
 param set-default SENS_MAG_MODE 0
@@ -152,8 +152,6 @@ param set-default SDLOG_MODE 1
 # enable default, estimator replay and vision/avoidance logging profiles
 param set-default SDLOG_PROFILE 131
 param set-default SDLOG_DIRS_MAX 7
-
-param set-default TRIG_INTERFACE 3
 
 # Adapt timeout parameters if simulation runs faster or slower than realtime.
 if [ -n "$PX4_SIM_SPEED_FACTOR" ]; then

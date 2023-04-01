@@ -37,7 +37,7 @@ param set-default PWM_MAIN_MIN 1075
 param set-default PWM_MAIN_RATE 0
 
 # enable high-rate logging profile (helps with tuning)
-param set-default SDLOG_PROFILE 19
+param set-default SDLOG_PROFILE 1035
 
 param set-default IMU_DGYRO_CUTOFF 50
 param set-default IMU_GYRO_CUTOFF 90

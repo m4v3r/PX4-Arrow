@@ -84,7 +84,7 @@ using namespace time_literals;
 Simulator::Simulator()
 	: ModuleParams(nullptr)
 {
-	int32_t sys_ctrl_alloc = 0;
+	int32_t sys_ctrl_alloc = 1;
 	param_get(param_find("SYS_CTRL_ALLOC"), &sys_ctrl_alloc);
 	_use_dynamic_mixing = sys_ctrl_alloc >= 1;
 }
