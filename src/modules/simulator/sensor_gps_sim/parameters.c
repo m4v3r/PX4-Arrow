@@ -38,4 +38,4 @@
  * @max  50
  * @group Simulator
  */
-PARAM_DEFINE_INT32(SIM_GPS_USED, 10);
+PARAM_DEFINE_INT32(SIM_GPS_USED, 22);
