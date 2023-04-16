@@ -308,7 +308,7 @@ param set-default RC_RSSI_PWM_MAX 2000
 param set-default RC_RSSI_PWM_MIN 1000
 param set-default RTL_CONE_ANG 0
 param set-default RTL_DESCEND_ALT 30.000000000000000000
-param set-default RTL_HDG_MD 1
+param set-default RTL_HDG_MD 0
 param set-default RTL_LAND_DELAY 12.000000000000000000
 param set-default RTL_RETURN_ALT 30.000000000000000000
 param set-default SDLOG_MISSION 1
