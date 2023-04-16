@@ -145,8 +145,8 @@ param set-default GF_ACTION 4
 param set-default GF_MAX_HOR_DIST 650
 param set-default GF_MAX_VER_DIST 65
 param set-default GF_PREDICT 0
-param set-default GPS_1_CONFIG 103
-param set-default GPS_2_CONFIG 201
+param set-default GPS_1_CONFIG 201
+param set-default GPS_2_CONFIG 103
 param set-default IMU_DGYRO_CUTOFF 50
 param set-default IMU_GYRO_CUTOFF 60
 param set-default IMU_GYRO_DNF_EN 1
