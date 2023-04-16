@@ -143,7 +143,7 @@ param set-default FD_FAIL_R 68
 param set-default FD_FAIL_R_TTRI 0.8
 param set-default GF_ACTION 4
 param set-default GF_MAX_HOR_DIST 650
-param set-default GF_MAX_VER_DIST 65
+param set-default GF_MAX_VER_DIST 50
 param set-default GF_PREDICT 0
 param set-default GPS_1_CONFIG 201
 param set-default GPS_2_CONFIG 103
