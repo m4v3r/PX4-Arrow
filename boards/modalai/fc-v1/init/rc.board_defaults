@@ -315,7 +315,7 @@ param set-default SDLOG_PROFILE 1035
 param set-default SENS_BOARD_ROT 4
 param set-default SENS_BOARD_X_OFF 1.068256020545959473
 param set-default SENS_BOARD_Y_OFF 0.526334762573242188
-param set-default SENS_GPS_MASK 7
+param set-default SENS_GPS_MASK 0
 param set-default SENS_GPS_PRIME -1
 param set-default SENS_MAG_MODE 0
 param set-default SER_TEL2_BAUD 921600
