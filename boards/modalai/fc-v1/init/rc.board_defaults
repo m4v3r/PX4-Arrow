@@ -147,6 +147,7 @@ param set-default GF_MAX_VER_DIST 50
 param set-default GF_PREDICT 0
 param set-default GPS_1_CONFIG 201
 param set-default GPS_2_CONFIG 103
+param set-default GPS_SAT_INFO 1
 param set-default IMU_DGYRO_CUTOFF 50
 param set-default IMU_GYRO_CUTOFF 60
 param set-default IMU_GYRO_DNF_EN 1
@@ -155,7 +156,7 @@ param set-default IMU_INTEG_RATE 400
 param set-default MAN_ARM_GESTURE 0
 param set-default MAV_PROTO_VER 2
 param set-default MAV_1_CONFIG 102
-param set-default MAV_1_MODE 0
+param set-default MAV_1_MODE 2
 param set-default MC_AIRMODE 2
 param set-default MC_PITCHRATE_D 0.0022
 param set-default MC_PITCHRATE_K 0.7
@@ -187,7 +188,7 @@ param set-default MPC_Z_VEL_MAX_DN 3.000000000000000000
 param set-default MPC_Z_VEL_MAX_UP 4.000000000000000000
 param set-default MPC_Z_V_AUTO_DN 2.200000047683715820
 param set-default MPC_Z_V_AUTO_UP 3.200000047683715820
-param set-default MPC_YAWRAUTO_MAX 50
+param set-default MPC_YAWRAUTO_MAX 55
 param set-default MPC_YAW_MODE 4
 param set-default NAV_RCL_ACT 2
 param set-default NAV_TRAFF_AVOID 0
