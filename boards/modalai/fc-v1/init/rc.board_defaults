@@ -15,11 +15,10 @@
 #
 
 #
-# Common settings across Flight Core configurations
+# Arrow Custom Setup Configuration
 #
 
 
-# TELEM2
 param set-default BAT1_N_CELLS 4
 param set-default BAT1_V_CHARGED 4.08
 param set-default BAT1_V_EMPTY 3.20
