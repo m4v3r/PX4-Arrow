@@ -40,7 +40,7 @@
  * @value 0 Disabled
  * @value 1 Enabled
   */
-PARAM_DEFINE_INT32(SENS_EN_GPSSIM, 0);
+PARAM_DEFINE_INT32(SENS_EN_GPSSIM, 1);
 
 /**
  * simulated GPS number of satellites used
@@ -49,4 +49,4 @@ PARAM_DEFINE_INT32(SENS_EN_GPSSIM, 0);
  * @max  50
  * @group Simulator
  */
-PARAM_DEFINE_INT32(SIM_GPS_USED, 10);
+PARAM_DEFINE_INT32(SIM_GPS_USED, 28);
