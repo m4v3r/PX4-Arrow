@@ -40,7 +40,7 @@
  * @value 0 Disabled
  * @value 1 Enabled
   */
-PARAM_DEFINE_INT32(SENS_EN_MAGSIM, 0);
+PARAM_DEFINE_INT32(SENS_EN_MAGSIM, 1);
 
 /**
  * simulated magnetometer X offset
