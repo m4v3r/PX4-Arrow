@@ -41,7 +41,7 @@
  * @value 0 Disabled
  * @value 1 Enabled
   */
-PARAM_DEFINE_INT32(SENS_EN_BAROSIM, 0);
+PARAM_DEFINE_INT32(SENS_EN_BAROSIM, 1);
 
 /**
  * simulated barometer pressure offset
