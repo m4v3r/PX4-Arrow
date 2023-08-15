@@ -17,7 +17,7 @@ fi
 
 param set-default NAV_ACC_RAD 2
 
-param set-default RTL_RETURN_ALT 30
-param set-default RTL_DESCEND_ALT 10
+param set-default RTL_RETURN_ALT 40
+param set-default RTL_DESCEND_ALT 20
 
 param set-default GPS_UBX_DYNMODEL 6
