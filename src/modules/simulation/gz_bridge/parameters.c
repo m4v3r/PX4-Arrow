@@ -38,7 +38,7 @@
  * @reboot_required true
  * @group UAVCAN
  */
-PARAM_DEFINE_INT32(SIM_GZ_EN, 0);
+PARAM_DEFINE_INT32(SIM_GZ_EN, 1);
 
 /**
  * simulator origin latitude
