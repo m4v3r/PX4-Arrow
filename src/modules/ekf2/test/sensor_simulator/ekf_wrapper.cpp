@@ -205,6 +205,11 @@ bool EkfWrapper::isIntendingMag3DFusion() const
 	return _ekf->control_status_flags().mag_3D;
 }
 
+bool EkfWrapper::isMagHeadingConsistent() const
+{
+	return _ekf->control_status_flags().mag_heading_consistent;
+}
+
 void EkfWrapper::setMagFuseTypeNone()
 {
 	_ekf_params->mag_fusion_type = MagFuseType::NONE;
@@ -303,4 +308,9 @@ void EkfWrapper::setDragFusionParameters(const float &bcoef_x, const float &bcoe
 	_ekf_params->bcoef_x = bcoef_x;
 	_ekf_params->bcoef_y = bcoef_y;
 	_ekf_params->mcoef = mcoef;
+}
+
+float EkfWrapper::getMagHeadingNoise() const
+{
+	return _ekf_params->mag_heading_noise;
 }

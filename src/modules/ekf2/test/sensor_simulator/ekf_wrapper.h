@@ -100,6 +100,7 @@ public:
 
 	bool isIntendingMagHeadingFusion() const;
 	bool isIntendingMag3DFusion() const;
+	bool isMagHeadingConsistent() const;
 	void setMagFuseTypeNone();
 	void enableMagStrengthCheck();
 	void enableMagInclinationCheck();
@@ -123,6 +124,8 @@ public:
 	void enableDragFusion();
 	void disableDragFusion();
 	void setDragFusionParameters(const float &bcoef_x, const float &bcoef_y, const float &mcoef);
+
+	float getMagHeadingNoise() const;
 
 private:
 	std::shared_ptr<Ekf> _ekf;
