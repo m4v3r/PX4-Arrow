@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   Copyright (c) 2013 Estimation and Control Library (ECL). All rights reserved.
+ *   Copyright (c) 2015-2023 PX4 Development Team. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -12,7 +12,7 @@
  *    notice, this list of conditions and the following disclaimer in
  *    the documentation and/or other materials provided with the
  *    distribution.
- * 3. Neither the name ECL nor the names of its contributors may be
+ * 3. Neither the name PX4 nor the names of its contributors may be
  *    used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -85,8 +85,8 @@ bool Ekf::collect_gps(const gpsMessage &gps)
 		_NED_origin_initialised = true;
 
 		// save the horizontal and vertical position uncertainty of the origin
-		_gps_origin_eph = gps.eph;
-		_gps_origin_epv = gps.epv;
+		_gpos_origin_eph = gps.eph;
+		_gpos_origin_epv = gps.epv;
 
 		_information_events.flags.gps_checks_passed = true;
 		ECL_INFO("GPS checks passed");

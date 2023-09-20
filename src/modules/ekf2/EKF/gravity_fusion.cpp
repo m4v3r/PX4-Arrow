@@ -12,7 +12,7 @@
  *    notice, this list of conditions and the following disclaimer in
  *    the documentation and/or other materials provided with the
  *    distribution.
- * 3. Neither the name ECL nor the names of its contributors may be
+ * 3. Neither the name PX4 nor the names of its contributors may be
  *    used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -82,7 +82,9 @@ void Ekf::controlGravityFusion(const imuSample &imu)
 
 	_aid_src_gravity.fusion_enabled = _control_status.flags.gravity_vector;
 
-	if (_aid_src_gravity.fusion_enabled && !_aid_src_gravity.innovation_rejected) {
+	const bool accel_clipping = imu.delta_vel_clipping[0] || imu.delta_vel_clipping[1] || imu.delta_vel_clipping[2];
+
+	if (_aid_src_gravity.fusion_enabled && !_aid_src_gravity.innovation_rejected && !accel_clipping) {
 		// perform fusion for each axis
 		_aid_src_gravity.fused = measurementUpdate(Kx, innovation_variance(0), innovation(0))
 					 && measurementUpdate(Ky, innovation_variance(1), innovation(1))

@@ -217,3 +217,22 @@ void Ekf::stopMagFusion()
 	}
 }
 
+void Ekf::saveMagCovData()
+{
+	// save the NED axis covariance sub-matrix
+	_saved_mag_ef_covmat = P.slice<State::mag_I.dof, State::mag_I.dof>(State::mag_I.idx, State::mag_I.idx);
+
+	// save the XYZ body covariance sub-matrix
+	_saved_mag_bf_covmat = P.slice<State::mag_B.dof, State::mag_B.dof>(State::mag_B.idx, State::mag_B.idx);
+}
+
+void Ekf::loadMagCovData()
+{
+	// re-instate the NED axis covariance sub-matrix
+	P.uncorrelateCovarianceSetVariance<State::mag_I.dof>(State::mag_I.idx, 0.f);
+	P.slice<State::mag_I.dof, State::mag_I.dof>(State::mag_I.idx, State::mag_I.idx) = _saved_mag_ef_covmat;
+
+	// re-instate the XYZ body axis covariance sub-matrix
+	P.uncorrelateCovarianceSetVariance<State::mag_B.dof>(State::mag_B.idx, 0.f);
+	P.slice<State::mag_B.dof, State::mag_B.dof>(State::mag_B.idx, State::mag_B.idx) = _saved_mag_bf_covmat;
+}

@@ -51,7 +51,12 @@ void Ekf::controlBaroHeightFusion()
 
 	if (_baro_buffer && _baro_buffer->pop_first_older_than(_time_delayed_us, &baro_sample)) {
 
+#if defined(CONFIG_EKF2_BARO_COMPENSATION)
 		const float measurement = compensateBaroForDynamicPressure(baro_sample.hgt);
+#else
+		const float measurement = baro_sample.hgt;
+#endif
+
 		const float measurement_var = sq(_params.baro_noise);
 
 		const float innov_gate = fmaxf(_params.baro_innov_gate, 1.f);
@@ -103,7 +108,7 @@ void Ekf::controlBaroHeightFusion()
 		if (measurement_valid) {
 			bias_est.setMaxStateNoise(sqrtf(measurement_var));
 			bias_est.setProcessNoiseSpectralDensity(_params.baro_bias_nsd);
-			bias_est.fuseBias(measurement - (-_state.pos(2)), measurement_var + P(9, 9));
+			bias_est.fuseBias(measurement - (-_state.pos(2)), measurement_var + P(State::pos.idx + 2, State::pos.idx + 2));
 		}
 
 		// determine if we should use height aiding
